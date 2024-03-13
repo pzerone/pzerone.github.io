@@ -1,0 +1,24 @@
+baseURL: 
+languageCode: en-us
+title: Sreejith IV - Blogfolio
+theme: ["PaperMod"]
+
+params:
+  DateFormat: "January 2, 2006"
+  defaultTheme: auto
+  disableThemeToggle: false
+
+menu:
+  main:
+    - identifier: Contact
+      name: Contact
+      url: /contact/
+      weight: 10
+    - identifier: About
+      name: About
+      url: /about/
+      weight: 10
+    - identifier: GitHub
+      name: GitHub
+      url: https://github.com/pzerone
+      weight: 10
