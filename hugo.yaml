@@ -1,4 +1,4 @@
-baseURL: 
+baseURL: 'https://sreejithiv.live'
 languageCode: en-us
 title: Sreejith IV - Blogfolio
 theme: ["PaperMod"]
@@ -8,6 +8,10 @@ params:
   DateFormat: "January 2, 2006"
   defaultTheme: auto
   disableThemeToggle: false
+
+  assets:
+    # disableHLJS: true
+    favicon: "/favicon.ico"
 
 menu:
   main:
