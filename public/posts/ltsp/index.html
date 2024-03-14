@@ -183,12 +183,13 @@ AUTOLOGIN=ltc                 # enables autologin for the above user
 </ul>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ltsp image &lt;image name&gt;
 </span></span><span style="display:flex;"><span>ltsp initrd
-</span></span></code></pre></div><h2 id="limitations">Limitations<a hidden class="anchor" aria-hidden="true" href="#limitations">#</a></h2>
+</span></span></code></pre></div><p>Done and dusted. Reboot your client and boot from your updated image</p>
+<h2 id="limitations">Limitations<a hidden class="anchor" aria-hidden="true" href="#limitations">#</a></h2>
 <h4 id="limited-to-single-user">Limited to single user<a hidden class="anchor" aria-hidden="true" href="#limited-to-single-user">#</a></h4>
 <p>Though this is a reliable approch to auto login to the client machine, we are limited to a single user since the systemd drop-in file can only have a single user.</p>
 <p>Unless we create multiple image for multiple clients, change the usernames on those images and finally change the LTSP config to auto login based on the client MAC address instead of using wildcard method.</p>
 <h4 id="works-only-on-vm-image-method">Works only on VM image method<a hidden class="anchor" aria-hidden="true" href="#works-only-on-vm-image-method">#</a></h4>
-<p>If we try to add the drop-in file to our server&rsquo;s systemd config, our server will start auto loging in to that user from the next boot onwards, which is not what we intend to do. Hence a VM image is reuired for this method to work</p>
+<p>If we try to add the drop-in file to our server&rsquo;s systemd config, our server will start auto logging into that user from the next boot onwards, which is not what we intend to do. Hence a VM image is required for this method to work</p>
 
 
   </div>

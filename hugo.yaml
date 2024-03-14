@@ -10,7 +10,7 @@ params:
   disableThemeToggle: false
 
   assets:
-    # disableHLJS: true
+    disableHLJS: true
     favicon: "/favicon.ico"
 
 menu:

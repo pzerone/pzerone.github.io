@@ -52,6 +52,7 @@ echo -n password | base64
 ltsp image <image name>
 ltsp initrd
 ```
+Done and dusted. Reboot your client and boot from your updated image
 
 ## Limitations
 
@@ -61,4 +62,4 @@ Though this is a reliable approch to auto login to the client machine, we are li
 Unless we create multiple image for multiple clients, change the usernames on those images and finally change the LTSP config to auto login based on the client MAC address instead of using wildcard method.
 
 #### Works only on VM image method
-If we try to add the drop-in file to our server's systemd config, our server will start auto loging in to that user from the next boot onwards, which is not what we intend to do. Hence a VM image is reuired for this method to work
+If we try to add the drop-in file to our server's systemd config, our server will start auto logging into that user from the next boot onwards, which is not what we intend to do. Hence a VM image is required for this method to work

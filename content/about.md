@@ -3,7 +3,7 @@ url = "/about/"
 summary = "about"
 +++
 
-## Ever met someone who just randomly starts a conversation about his hatred towards microsoft?
+## Ever met someone who randomly start conversations about their hatred for Microsoft?
 **I'm totally not that guy**
 
 
