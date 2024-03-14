@@ -4,6 +4,7 @@ title: Sreejith IV - Blogfolio
 theme: ["PaperMod"]
 
 params:
+  ShowCodeCopyButtons: true
   DateFormat: "January 2, 2006"
   defaultTheme: auto
   disableThemeToggle: false
@@ -13,7 +14,7 @@ menu:
     - identifier: Contact
       name: Contact
       url: /contact/
-      weight: 10
+      weight: 20
     - identifier: About
       name: About
       url: /about/
@@ -21,4 +22,4 @@ menu:
     - identifier: GitHub
       name: GitHub
       url: https://github.com/pzerone
-      weight: 10
+      weight: 30

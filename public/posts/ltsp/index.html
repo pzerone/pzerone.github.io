@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>LTSP: Setting up auto login for clients without a Display Manager | Sreejith IV - Blogfolio</title>
+<meta name="keywords" content="">
+<meta name="description" content="Introduction LTSP&rsquo;s default implementation of auto login is technically not auto login. It requires the user to press Enter on the dislay manager page. We can overcome this limitation by getting rid of the display manager altogether and use agetty to properly auto login the user to their shell.
+Auto login can be implemented on the client to login to the TTY automatically without user interaction. From there we can start xorg or run custom scripts using our shell&rsquo;s profile file: ie bash_profile.">
+<meta name="author" content="">
+<link rel="canonical" href="//localhost:1313/posts/ltsp/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.4201f63805ab0f01947eba3e5b33eb2beb5e2408698c2b500cd801b67759ea61.css" integrity="sha256-QgH2OAWrDwGUfro&#43;WzPrK&#43;teJAhpjCtQDNgBtndZ6mE=" rel="preload stylesheet" as="style">
+<link rel="icon" href="//localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="//localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="//localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="//localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="//localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="//localhost:1313/posts/ltsp/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="//localhost:1313/" accesskey="h" title="Sreejith IV - Blogfolio (Alt + H)">Sreejith IV - Blogfolio</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="//localhost:1313/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+            <li>
+                <a href="//localhost:1313/contact/" title="Contact">
+                    <span>Contact</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://github.com/pzerone" title="GitHub">
+                    <span>GitHub</span>&nbsp;
+                    <svg fill="none" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" height="12" width="12">
+                        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
+                        <path d="M15 3h6v6"></path>
+                        <path d="M10 14L21 3"></path>
+                    </svg>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      LTSP: Setting up auto login for clients without a Display Manager
+    </h1>
+    <div class="post-meta"><span title='2024-03-13 21:39:34 +0530 IST'>March 13, 2024</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h2 id="introduction">Introduction<a hidden class="anchor" aria-hidden="true" href="#introduction">#</a></h2>
+<p>LTSP&rsquo;s default implementation of auto login is technically <em>not</em> auto login. It requires the user to press <em>Enter</em> on the dislay manager page. We can overcome this limitation by getting rid of the display manager altogether and use <code>agetty</code> to properly auto login the user to their shell.</p>
+<p>Auto login can be implemented on the client to login to the TTY automatically without user interaction. From there we can start xorg or run custom scripts using our shell&rsquo;s profile file: ie <code>bash_profile</code>. For this to work, we need:</p>
+<ul>
+<li>Auto login with agetty using systemd drop-in file on the client OS</li>
+<li>Auto login for LTSP client, configured on the server OS</li>
+<li>A user for the clients to auto log in to, created on the server OS</li>
+</ul>
+<blockquote>
+<p><em>The first one alone won&rsquo;t be able to run our shell profile file since without proper SSHFS/NFS mount, we will get dropped into <code>/</code> without proper home directory</em></p>
+</blockquote>
+<blockquote>
+<p><em>The second one alone won&rsquo;t technically &ldquo;auto-login&rdquo; the user, it just wait for the user to press enter on the login screen and hence we need user interaction.</em></p>
+</blockquote>
+<h2 id="the-setup">The setup<a hidden class="anchor" aria-hidden="true" href="#the-setup">#</a></h2>
+<p>First, start the VM and add a systemd drop-in file</p>
+<ul>
+<li>systemd drop-in file <em>(To be placed inside the client OS image)</em>:</li>
+</ul>
+<p><code>/etc/systemd/system/getty@tty1.service.d/autologin.conf</code></p>
+<pre tabindex="0"><code>[Service]
+ExecStart=
+ExecStart=-/sbin/agetty -o &#39;-p -f -- \\u&#39; --noclear --autologin username %I $TERM
+</code></pre><blockquote>
+<p><em>replace <strong>username</strong> with the username we want to auto-login</em></p>
+</blockquote>
+<ul>
+<li>For LTSP auto login, create the <code>ltsp.conf</code> file at <code>/etc/ltsp/ltsp.conf</code> using</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>install -m <span style="color:#ae81ff">0660</span> -g sudo /usr/share/ltsp/common/ltsp/ltsp.conf /etc/ltsp/ltsp.conf
+</span></span></code></pre></div><p>After that, add the following code to the <code>[client]</code> section of <code>ltsp.conf</code></p>
+<pre tabindex="0"><code>[*]                           # Wild card to catch all clients
+HOSTNAME=client               # host name for clients
+PASSWORDS_client=ltc/cm9vdA== # username/base64 encoded password
+AUTOLOGIN=ltc                 # enables autologin for the above user
+</code></pre><blockquote>
+<p><em>replace <strong>client</strong> with a hostname for the clients and <strong>ltc</strong> with the user that we want to auto login.</em>
+<em>Password for the user should be converted to base64. Pipe it into <code>base64</code> from the commandline like this:</em></p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>echo -n password | base64
+</span></span></code></pre></div><blockquote>
+<p><em>Replace <strong>password</strong> with your user password</em></p>
+</blockquote>
+<ul>
+<li>Regenerate image and initrd</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ltsp image &lt;image name&gt;
+</span></span><span style="display:flex;"><span>ltsp initrd
+</span></span></code></pre></div><h2 id="limitations">Limitations<a hidden class="anchor" aria-hidden="true" href="#limitations">#</a></h2>
+<h4 id="limited-to-single-user">Limited to single user<a hidden class="anchor" aria-hidden="true" href="#limited-to-single-user">#</a></h4>
+<p>Though this is a reliable approch to auto login to the client machine, we are limited to a single user since the systemd drop-in file can only have a single user.</p>
+<p>Unless we create multiple image for multiple clients, change the usernames on those images and finally change the LTSP config to auto login based on the client MAC address instead of using wildcard method.</p>
+<h4 id="works-only-on-vm-image-method">Works only on VM image method<a hidden class="anchor" aria-hidden="true" href="#works-only-on-vm-image-method">#</a></h4>
+<p>If we try to add the drop-in file to our server&rsquo;s systemd config, our server will start auto loging in to that user from the next boot onwards, which is not what we intend to do. Hence a VM image is reuired for this method to work</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2024 <a href="//localhost:1313/">Sreejith IV - Blogfolio</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
