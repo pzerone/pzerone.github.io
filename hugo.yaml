@@ -8,6 +8,7 @@ params:
   DateFormat: "January 2, 2006"
   defaultTheme: auto
   disableThemeToggle: false
+  env: production
 
   assets:
     disableHLJS: true
