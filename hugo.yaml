@@ -13,6 +13,7 @@ params:
   assets:
     disableHLJS: true
     favicon: "/favicon.ico"
+    disableFingerprinting: true
 
 menu:
   main:
