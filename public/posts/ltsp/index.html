@@ -11,7 +11,7 @@
 Auto login can be implemented on the client to login to the TTY automatically without user interaction. From there we can start xorg or run custom scripts using our shell&rsquo;s profile file: ie bash_profile.">
 <meta name="author" content="">
 <link rel="canonical" href="http://localhost:1313/posts/ltsp/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.4eec312f24e70249ac303f497345c24671e688bed11e1059a3e07a1f6ee76ebe.css" integrity="sha256-TuwxLyTnAkmsMD9Jc0XCRnHmiL7RHhBZo&#43;B6H27nbr4=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
@@ -56,7 +56,10 @@ Auto login can be implemented on the client to login to the TTY automatically wi
         }
 
     </style>
-</noscript><meta property="og:title" content="LTSP: Setting up auto login for clients without a Display Manager" />
+</noscript><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+<script data-goatcounter="https://sreejith.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script><meta property="og:title" content="LTSP: Setting up auto login for clients without a Display Manager" />
 <meta property="og:description" content="Introduction LTSP&rsquo;s default implementation of auto login is technically not auto login. It requires the user to press Enter on the dislay manager page. We can overcome this limitation by getting rid of the display manager altogether and use agetty to properly auto login the user to their shell.
 Auto login can be implemented on the client to login to the TTY automatically without user interaction. From there we can start xorg or run custom scripts using our shell&rsquo;s profile file: ie bash_profile." />
 <meta property="og:type" content="article" />
