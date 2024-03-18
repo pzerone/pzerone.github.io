@@ -4,7 +4,7 @@
 <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>LTSP: Setting up auto login for clients without a Display Manager | Sreejith IV - Blogfolio</title>
 <meta name="keywords" content="">
 <meta name="description" content="Introduction LTSP&rsquo;s default implementation of auto login is technically not auto login. It requires the user to press Enter on the dislay manager page. We can overcome this limitation by getting rid of the display manager altogether and use agetty to properly auto login the user to their shell.
@@ -56,7 +56,69 @@ Auto login can be implemented on the client to login to the TTY automatically wi
         }
 
     </style>
-</noscript>
+</noscript><meta property="og:title" content="LTSP: Setting up auto login for clients without a Display Manager" />
+<meta property="og:description" content="Introduction LTSP&rsquo;s default implementation of auto login is technically not auto login. It requires the user to press Enter on the dislay manager page. We can overcome this limitation by getting rid of the display manager altogether and use agetty to properly auto login the user to their shell.
+Auto login can be implemented on the client to login to the TTY automatically without user interaction. From there we can start xorg or run custom scripts using our shell&rsquo;s profile file: ie bash_profile." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/ltsp/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-03-13T21:39:34+05:30" />
+<meta property="article:modified_time" content="2024-03-13T21:39:34+05:30" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="LTSP: Setting up auto login for clients without a Display Manager"/>
+<meta name="twitter:description" content="Introduction LTSP&rsquo;s default implementation of auto login is technically not auto login. It requires the user to press Enter on the dislay manager page. We can overcome this limitation by getting rid of the display manager altogether and use agetty to properly auto login the user to their shell.
+Auto login can be implemented on the client to login to the TTY automatically without user interaction. From there we can start xorg or run custom scripts using our shell&rsquo;s profile file: ie bash_profile."/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "LTSP: Setting up auto login for clients without a Display Manager",
+      "item": "http://localhost:1313/posts/ltsp/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "LTSP: Setting up auto login for clients without a Display Manager",
+  "name": "LTSP: Setting up auto login for clients without a Display Manager",
+  "description": "Introduction LTSP\u0026rsquo;s default implementation of auto login is technically not auto login. It requires the user to press Enter on the dislay manager page. We can overcome this limitation by getting rid of the display manager altogether and use agetty to properly auto login the user to their shell.\nAuto login can be implemented on the client to login to the TTY automatically without user interaction. From there we can start xorg or run custom scripts using our shell\u0026rsquo;s profile file: ie bash_profile.",
+  "keywords": [
+    
+  ],
+  "articleBody": "Introduction LTSP’s default implementation of auto login is technically not auto login. It requires the user to press Enter on the dislay manager page. We can overcome this limitation by getting rid of the display manager altogether and use agetty to properly auto login the user to their shell.\nAuto login can be implemented on the client to login to the TTY automatically without user interaction. From there we can start xorg or run custom scripts using our shell’s profile file: ie bash_profile. For this to work, we need:\nAuto login with agetty using systemd drop-in file on the client OS Auto login for LTSP client, configured on the server OS A user for the clients to auto log in to, created on the server OS The first one alone won’t be able to run our shell profile file since without proper SSHFS/NFS mount, we will get dropped into / without proper home directory\nThe second one alone won’t technically “auto-login” the user, it just wait for the user to press enter on the login screen and hence we need user interaction.\nThe setup First, start the VM and add a systemd drop-in file\nsystemd drop-in file (To be placed inside the client OS image): /etc/systemd/system/getty@tty1.service.d/autologin.conf\n[Service] ExecStart= ExecStart=-/sbin/agetty -o '-p -f -- \\\\u' --noclear --autologin username %I $TERM replace username with the username we want to auto-login\nFor LTSP auto login, create the ltsp.conf file at /etc/ltsp/ltsp.conf using install -m 0660 -g sudo /usr/share/ltsp/common/ltsp/ltsp.conf /etc/ltsp/ltsp.conf After that, add the following code to the [client] section of ltsp.conf\n[*] # Wild card to catch all clients HOSTNAME=client # host name for clients PASSWORDS_client=ltc/cm9vdA== # username/base64 encoded password AUTOLOGIN=ltc # enables autologin for the above user replace client with a hostname for the clients and ltc with the user that we want to auto login. Password for the user should be converted to base64. Pipe it into base64 from the commandline like this:\necho -n password | base64 Replace password with your user password\nRegenerate image and initrd ltsp image ltsp initrd Done and dusted. Reboot your client and boot from your updated image\nLimitations Limited to single user Though this is a reliable approch to auto login to the client machine, we are limited to a single user since the systemd drop-in file can only have a single user.\nUnless we create multiple image for multiple clients, change the usernames on those images and finally change the LTSP config to auto login based on the client MAC address instead of using wildcard method.\nWorks only on VM image method If we try to add the drop-in file to our server’s systemd config, our server will start auto logging into that user from the next boot onwards, which is not what we intend to do. Hence a VM image is required for this method to work\n",
+  "wordCount" : "477",
+  "inLanguage": "en",
+  "datePublished": "2024-03-13T21:39:34+05:30",
+  "dateModified": "2024-03-13T21:39:34+05:30",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/ltsp/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Sreejith IV - Blogfolio",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
 </head>
 
 <body class="" id="top">
