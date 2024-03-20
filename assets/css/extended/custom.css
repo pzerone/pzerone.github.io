@@ -1,17 +1,3 @@
-// <uniquifier>: Use a unique and descriptive class name
-// <weight>: Use a value from 200 to 900
-
-.source-code pro-<uniquifier> {
-  font-family: "Source Code Pro", monospace;
-  font-optical-sizing: auto;
-  font-weight: <weight>;
-  font-style: normal;
-}
-
-body {
-    font-family: 'Source Code Pro', sans-serif;
-}
-
 :root {
-    --main-width: 900px;
+    --main-width: 1000px;
 }
